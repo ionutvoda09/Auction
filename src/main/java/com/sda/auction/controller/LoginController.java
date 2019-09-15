@@ -2,6 +2,7 @@ package com.sda.auction.controller;
 
 
 		import com.sda.auction.dto.UserForm;
+		import com.sda.auction.model.User;
 		import com.sda.auction.service.UserService;
 		import javax.validation.Valid;
 		import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,16 @@ public class LoginController {
 		if (bindingResult.hasErrors()) {
 			System.out.println("eroare");
 		} else {
-			userService.saveUser(userForm);
-			modelAndView.addObject(new UserForm());
-			modelAndView.addObject("successMessage",
-					"Good job! Looking forward to spend your money!");
-
+			User existingUser = userService.findByEmail(userForm.getEmail());
+			if(existingUser !=null){
+			bindingResult.rejectValue("email","erros.user",
+					"There is alredy a user regitered with this email");
+			}else {
+				userService.saveUser(userForm);
+				modelAndView.addObject(new UserForm());
+				modelAndView.addObject("successMessage",
+						"Good job! Looking forward to spend your money!");
+			}
 		}
 		modelAndView.setViewName("registration");
 		return modelAndView;
